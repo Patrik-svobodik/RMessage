@@ -22,10 +22,9 @@ DESC
   s.social_media_url = 'https://twitter.com/donileo'
 
   s.source           = { :git => "https://github.com/donileo/RMessage.git", :tag => s.version.to_s }
-  s.platform     = :ios, '11.0'
-  s.swift_version = "4.1"
+  s.platform     = :ios, '13.0'
+  s.swift_version = "5.2"
   s.requires_arc = true
   s.source_files = 'Sources/**/*.{swift}'
   s.resources = ['Sources/Resources/**/*.xib', 'Sources/Assets/**/*.{png,jpg,jpeg,json,pdf}']
-  s.dependency 'HexColors', '~> 6.0'
 end

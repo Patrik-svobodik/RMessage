@@ -90,20 +90,16 @@ class SlideAnimator: NSObject, RMAnimator {
   /// subsequent requests.
   /// - Parameter completion: A completion closure to execute after presentation is complete.
   /// - Returns: A boolean value indicating if the animator executed your instruction to present.
-  func present(withCompletion completion: (() -> Void)?) -> Bool {
+  func present(withCompletion completion: (() -> ())? = nil) -> Bool {
     // Guard against being called under the following conditions:
     // 1. If currently presenting or dismissing
     // 2. If already presented or have not yet dismissed
-    guard !isPresenting && !hasPresented && hasDismissed else {
-      return false
-    }
-
+    guard !isPresenting, !hasPresented, hasDismissed else { return false }
     layoutView()
     setupFinalAnimationConstraints()
     setupStartingAnimationConstraints()
     delegate?.animatorWillAnimatePresentation?(self)
     animatePresentation(withCompletion: completion)
-
     return true
   }
 
@@ -115,21 +111,17 @@ class SlideAnimator: NSObject, RMAnimator {
   /// subsequent requests.
   /// - Parameter completion: A completion closure to execute after presentation is complete.
   /// - Returns: A boolean value indicating if the animator executed your instruction to dismiss.
-  func dismiss(withCompletion completion: (() -> Void)?) -> Bool {
+  func dismiss(withCompletion completion: (() -> ())? = nil) -> Bool {
     // Guard against being called under the following conditions:
     // 1. If currently presenting or dismissing
     // 2. If already dismissed or have not yet presented
-    guard !isDismissing && hasDismissed && hasPresented else {
-      return false
-    }
-
+    guard !isPresenting, !hasPresented, hasDismissed else { return false }
     delegate?.animatorWillAnimateDismissal?(self)
-    animateDismissal(withCompletion: completion)
-
+    animateDismissal(completion: completion)
     return true
   }
 
-  private func animatePresentation(withCompletion completion: (() -> Void)?) {
+  private func animatePresentation(withCompletion completion: (() -> ())? = nil) {
     guard let viewSuper = view.superview else {
       assertionFailure("view must have superview by this point")
       return
@@ -171,7 +163,7 @@ class SlideAnimator: NSObject, RMAnimator {
   }
 
   /** Dismiss the view with a completion block */
-  private func animateDismissal(withCompletion completion: (() -> Void)?) {
+  private func animateDismissal(completion: (() -> ())? = nil) {
     guard let viewSuper = view.superview else {
       assertionFailure("view must have superview by this point")
       return
@@ -219,7 +211,7 @@ class SlideAnimator: NSObject, RMAnimator {
   }
 
   private func safeAreaInsetsDidChange(forView view: UIView) {
-    var constant = CGFloat(0)
+    let constant: CGFloat
     if targetPosition == .bottom {
       constant = springAnimationPadding + view.safeAreaInsets.bottom
     } else {
@@ -290,8 +282,8 @@ class SlideAnimator: NSObject, RMAnimator {
       return
     }
 
-    var viewAttribute: NSLayoutAttribute
-    var layoutGuideAttribute: NSLayoutAttribute
+    var viewAttribute: NSLayoutConstraint.Attribute
+    var layoutGuideAttribute: NSLayoutConstraint.Attribute
     var constant = CGFloat(0)
 
     view.layoutIfNeeded()
